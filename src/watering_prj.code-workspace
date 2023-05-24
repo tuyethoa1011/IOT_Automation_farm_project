@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../working_space/projects_ws/watering_prj"
+		},
+		{
+			"name": "MQTT",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
