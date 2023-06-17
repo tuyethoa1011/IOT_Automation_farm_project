@@ -8,16 +8,16 @@
 #include <string.h>
 
 
-const char* ssid = "Nam Siêu Cấp Vô Địch";
-const char* password = "darrenshan1209";
-
 #define pin_hm 34  // pin doc du lieu tu cam bien do am dat
 #define pin_valve GPIO_NUM_16 // pin kich van tuoi
-#define MQTT_SERVER "broker-channel.cloud.shiftr.io"
+//#define pin_button GPIO_NUM_17 // pin chuyen che do (Manual/Auto)
+#define MQTT_SERVER "broker1011.cloud.shiftr.io"
 #define MQTT_PORT 1883
-#define MQTT_USER "broker-channel"
-#define MQTT_PASSWORD "rvCvDiwfvqcVPjoV"
-#define MQTT_TOPIC "IOT"
+#define MQTT_USER "broker1011"
+#define MQTT_PASSWORD "JPq0XvVj0dhW078L"
+#define MQTT_TOPIC "sensor/soil_mst"
+#define USER_INTERRACT_MODE_TOPIC "mode"
+#define USER_INTERRACT_MANUAL_TOPIC "mode/water_manual"
 
 ESP32Time rtc(0);
 
@@ -100,20 +100,27 @@ void CheckOnActive(){
   }
 }
 void setup_wifi(){
-  Serial.print("Kết nối với ...");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while(WiFi.status() != WL_CONNECTED){
+  int cnt = 0;
+  //Khởi tạo baud 115200
+  Serial.begin(115200);
+  //Mode wifi là station
+  WiFi.mode(WIFI_STA);
+  //Chờ kết nối
+  while(WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-
-  }
-  randomSeed(micros());
-  Serial.println("");
-  Serial.println("Wifi đã được kết nối");
-  Serial.println("Địa chỉ IP: ");
-  Serial.println(WiFi.localIP());
-
+    if(cnt++ >= 10){
+       WiFi.beginSmartConfig();
+       while(1){
+           delay(1000);
+           //Kiểm tra kết nối thành công in thông báo
+           if(WiFi.smartConfigDone()){
+             Serial.println("SmartConfig Success");
+             break;
+           }
+       }
+    }
+}
 }
 void connect_to_broker(){
   while(!client.connected()){
@@ -131,16 +138,66 @@ void connect_to_broker(){
     }
   }
 }
+
+static bool manual_mode = false; 
+static bool auto_mode = true; //auto mode luôn bật chỉ tắt khi bật manual
+
 void callback(char* topic, byte *payload, unsigned int length) {
+  //trước khi nhận message hoặc topic, clear chuỗi và byte trước khi ghi
+  memset((char*)&topic,0,sizeof(topic));
+  memset((char*)&payload,0,sizeof(payload));
+
   Serial.println("-------new message from broker-----");
   Serial.print("topic: ");
   Serial.println(topic);
-  Serial.println(analogRead(pin_hm));
   Serial.print("message: ");
   Serial.write(payload, length);
-  Serial.println();
-  if (*payload == '1') current_ledState = HIGH;
-  if (*payload == '0') current_ledState = LOW;
+
+  if(auto_mode && !manual_mode)
+  {
+    if(strcmp((const char*)&topic,USER_INTERRACT_MODE_TOPIC) == 0) //check topic mode
+    {
+      if(strcmp((const char*)&payload,"manual") == 0) 
+      {
+        manual_mode = true;
+        auto_mode = false;
+      } else if (strcmp((const char*)&payload,"auto") == 0)
+      {
+        //do nothing
+        auto_mode = true;
+        manual_mode = false;
+      }
+    }
+  } else if(manual_mode && !auto_mode)
+  {
+    //nếu topic nhận được chuyển chế độ thì chỉnh lại biến
+    if(strcmp((const char*)&topic,USER_INTERRACT_MANUAL_TOPIC) == 0)
+    {
+      if(payload[0] == '1') //bật van tưới
+      {
+        digitalWrite(pin_valve,HIGH); //mở van
+        on_off = 1; //thông báo trạng thái hiện tại van đang tưới
+      } else if(payload[0] == '0') //tắt van tưới
+      {
+        digitalWrite(pin_valve,LOW); //tắt van
+        on_off = 0; //thông báo trạng thái hiện tại van tắt
+      }
+    }
+    if(strcmp((const char*)&topic,USER_INTERRACT_MODE_TOPIC) == 0) //check topic mode
+    {
+      if(strcmp((const char*)&payload,"manual") == 0) 
+      {
+        manual_mode = true;
+        auto_mode = false;
+      } else if (strcmp((const char*)&payload,"auto") == 0)
+      {
+        //do nothing
+        auto_mode = true;
+        manual_mode = false;
+      }
+    }
+  }
+
 }
 
 void setup() {
@@ -153,19 +210,22 @@ void setup() {
   digitalWrite(pin_valve,LOW);
   Serial.setTimeout(500);
   setup_wifi();
+  
   client.setServer(MQTT_SERVER, MQTT_PORT );
   client.setCallback(callback);
   connect_to_broker();
 }
 
-
 void send_data() {
   client.publish(MQTT_TOPIC,String(ReadHumidity(pin_hm)).c_str(),true); 
+  //delay(1000*10);
   delay(1000);
 }
 
+
 void loop() {
   UpdateTimeRTC();
+
   CheckOnActive();
   delay(200);
   client.loop();
