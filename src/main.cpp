@@ -6,8 +6,11 @@
 #include <ESP32Time.h>
 #include <NTPClient.h>
 #include <string.h>
+#include <DHT.h>
+#include <DHT_U.h>
 
-
+#define DHTPIN 5 //pin đọc dữ liệu cảm biến nhiệt độ, độ ẩm
+#define DHTTYPE  DHT11
 #define pin_hm 34  // pin doc du lieu tu cam bien do am dat
 #define pin_valve GPIO_NUM_16 // pin kich van tuoi
 //#define pin_button GPIO_NUM_17 // pin chuyen che do (Manual/Auto)
@@ -16,10 +19,14 @@
 #define MQTT_USER "broker1011"
 #define MQTT_PASSWORD "JPq0XvVj0dhW078L"
 #define MQTT_TOPIC "sensor/soil_mst"
+#define MQTT_DHT_TOPIC_H "sensor/humidity"
+#define MQTT_DHT_TOPIC_T "sensor/temperature"
 #define USER_INTERRACT_MODE_TOPIC "mode"
 #define USER_INTERRACT_MANUAL_TOPIC "mode/water_manual"
 
 ESP32Time rtc(0);
+
+DHT dht(DHTPIN,DHTTYPE); //khai báo tạo object dht
 
 // Dat thoi gian tuoi cay 
 /* Thoi gian tuoi lan 1 */
@@ -129,7 +136,9 @@ void connect_to_broker(){
     clientID += String(random(0xffff), HEX);
     if (client.connect(clientID.c_str(), MQTT_USER, MQTT_PASSWORD)) {
       Serial.println("Đã kết nối");
-      client.subscribe(MQTT_TOPIC);
+      client.subscribe(MQTT_TOPIC); 
+      client.subscribe(MQTT_DHT_TOPIC_H); 
+      client.subscribe(MQTT_DHT_TOPIC_T); 
     } else {
       Serial.print("Lỗi, rc=");
       Serial.print(client.state());
@@ -218,6 +227,8 @@ void setup() {
 
 void send_data() {
   client.publish(MQTT_TOPIC,String(ReadHumidity(pin_hm)).c_str(),true); 
+  client.publish(MQTT_DHT_TOPIC_H,String(analogRead(DHTPIN)).c_str(),true); 
+  client.publish(MQTT_DHT_TOPIC_T,String(analogRead(DHTPIN)).c_str(),true); 
   //delay(1000*10);
   delay(1000);
 }
