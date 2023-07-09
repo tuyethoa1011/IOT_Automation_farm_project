@@ -6,27 +6,32 @@
 #include <ESP32Time.h>
 #include <NTPClient.h>
 #include <string.h>
-#include <DHT.h>
-#include <DHT_U.h>
+//#include <DHT.h>
+//#include <DHT_U.h>
 
-#define DHTPIN 5 //pin đọc dữ liệu cảm biến nhiệt độ, độ ẩm
-#define DHTTYPE  DHT11
-#define pin_hm 34  // pin doc du lieu tu cam bien do am dat
-#define pin_valve GPIO_NUM_16 // pin kich van tuoi
+//#define DHTPIN 5 //pin đọc dữ liệu cảm biến nhiệt độ, độ ẩm
+//#define DHTTYPE  DHT11
+#define pin_hm GPIO_NUM_34  // pin doc du lieu tu cam bien do am 
+#define pin_valve GPIO_NUM_2 // pin kich van tuoi
 //#define pin_button GPIO_NUM_17 // pin chuyen che do (Manual/Auto)
 #define MQTT_SERVER "broker1011.cloud.shiftr.io"
 #define MQTT_PORT 1883
 #define MQTT_USER "broker1011"
 #define MQTT_PASSWORD "JPq0XvVj0dhW078L"
 #define MQTT_TOPIC "sensor/soil_mst"
-#define MQTT_DHT_TOPIC_H "sensor/humidity"
-#define MQTT_DHT_TOPIC_T "sensor/temperature"
+//#define MQTT_DHT_TOPIC_H "sensor/humidity"
+//#define MQTT_DHT_TOPIC_T "sensor/temperature"
 #define USER_INTERRACT_MODE_TOPIC "mode"
-#define USER_INTERRACT_MANUAL_TOPIC "mode/water_manual"
+#define USER_INTERRACT_MANUAL_TOPIC "water_manual"
+
+
+const char* ssid = "Ngo Van Hoa";
+const char* password = "25021971";
+
 
 ESP32Time rtc(0);
 
-DHT dht(DHTPIN,DHTTYPE); //khai báo tạo object dht
+//DHT dht(DHTPIN,DHTTYPE); //khai báo tạo object dht
 
 // Dat thoi gian tuoi cay 
 /* Thoi gian tuoi lan 1 */
@@ -52,6 +57,9 @@ uint8_t hm2 = 75;
 uint8_t on_off = 0;
 int current_ledState = LOW;
 int last_ledState = LOW;
+
+bool manual_mode = false; 
+bool auto_mode = true; //auto mode luôn bật chỉ tắt khi bật manual
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
@@ -106,29 +114,24 @@ void CheckOnActive(){
     }
   }
 }
+
 void setup_wifi(){
-  int cnt = 0;
-  //Khởi tạo baud 115200
-  Serial.begin(115200);
-  //Mode wifi là station
-  WiFi.mode(WIFI_STA);
-  //Chờ kết nối
-  while(WiFi.status() != WL_CONNECTED) {
+  Serial.print("Kết nối với ...");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while(WiFi.status() != WL_CONNECTED){
     delay(500);
     Serial.print(".");
-    if(cnt++ >= 10){
-       WiFi.beginSmartConfig();
-       while(1){
-           delay(1000);
-           //Kiểm tra kết nối thành công in thông báo
-           if(WiFi.smartConfigDone()){
-             Serial.println("SmartConfig Success");
-             break;
-           }
-       }
-    }
+
+  }
+  randomSeed(micros());
+  Serial.println("");
+  Serial.println("Wifi đã được kết nối");
+  Serial.println("Địa chỉ IP: ");
+  Serial.println(WiFi.localIP());
 }
-}
+
+
 void connect_to_broker(){
   while(!client.connected()){
     Serial.print("Đang kết nối với MQTT Sever");
@@ -137,8 +140,10 @@ void connect_to_broker(){
     if (client.connect(clientID.c_str(), MQTT_USER, MQTT_PASSWORD)) {
       Serial.println("Đã kết nối");
       client.subscribe(MQTT_TOPIC); 
-      client.subscribe(MQTT_DHT_TOPIC_H); 
-      client.subscribe(MQTT_DHT_TOPIC_T); 
+      //client.subscribe(MQTT_DHT_TOPIC_H); 
+      //client.subscribe(MQTT_DHT_TOPIC_T); 
+      client.subscribe(USER_INTERRACT_MODE_TOPIC); //subribe to mode topic to recieve signal from application control valve from user
+      client.subscribe(USER_INTERRACT_MANUAL_TOPIC); //subcribe to water manual topic to know if user want to turn on valve or not
     } else {
       Serial.print("Lỗi, rc=");
       Serial.print(client.state());
@@ -146,65 +151,67 @@ void connect_to_broker(){
       delay(2000);
     }
   }
+  
 }
 
-static bool manual_mode = false; 
-static bool auto_mode = true; //auto mode luôn bật chỉ tắt khi bật manual
-
+//int ready = 1;
 void callback(char* topic, byte *payload, unsigned int length) {
-  //trước khi nhận message hoặc topic, clear chuỗi và byte trước khi ghi
-  memset((char*)&topic,0,sizeof(topic));
-  memset((char*)&payload,0,sizeof(payload));
 
   Serial.println("-------new message from broker-----");
   Serial.print("topic: ");
-  Serial.println(topic);
-  Serial.print("message: ");
+  Serial.print(topic);
+  Serial.print("\nmessage: ");
   Serial.write(payload, length);
 
-  if(auto_mode && !manual_mode)
-  {
-    if(strcmp((const char*)&topic,USER_INTERRACT_MODE_TOPIC) == 0) //check topic mode
+  //Debug check mode
+  Serial.print("\nAuto Mode: ");
+  Serial.println(auto_mode);
+  Serial.print("Manual mode: ");
+  Serial.println(manual_mode);
+  Serial.print("On off state: ");
+  Serial.println(on_off);
+
+  if(String(topic) == "mode")//check topic mode
+  { 
+    if((char)payload[0]=='0') 
+    { 
+      manual_mode = true;
+      auto_mode = false;
+      digitalWrite(pin_valve,LOW);
+      on_off = 0;
+      //ready = 1;
+    } else if ((char)payload[0]=='1')
     {
-      if(strcmp((const char*)&payload,"manual") == 0) 
-      {
-        manual_mode = true;
-        auto_mode = false;
-      } else if (strcmp((const char*)&payload,"auto") == 0)
-      {
         //do nothing
         auto_mode = true;
         manual_mode = false;
-      }
+        //if(ready) {
+        //tắt van trước khi đi vào chế độ auto
+        digitalWrite(pin_valve,LOW);
+        on_off = 0;
+        //ready = 0;
+        //}
     }
+  }
+  
+  if(auto_mode && !manual_mode)
+  { 
+    CheckOnActive();
   } else if(manual_mode && !auto_mode)
-  {
+  { 
     //nếu topic nhận được chuyển chế độ thì chỉnh lại biến
-    if(strcmp((const char*)&topic,USER_INTERRACT_MANUAL_TOPIC) == 0)
-    {
-      if(payload[0] == '1') //bật van tưới
+    if(String(topic) == "water_manual")
+    { 
+      if((char)payload[0]=='2') //bật van tưới
       {
         digitalWrite(pin_valve,HIGH); //mở van
-        on_off = 1; //thông báo trạng thái hiện tại van đang tưới
-      } else if(payload[0] == '0') //tắt van tưới
-      {
+      
+      } else if((char)payload[0]=='3') //tắt van tưới
+      { 
         digitalWrite(pin_valve,LOW); //tắt van
-        on_off = 0; //thông báo trạng thái hiện tại van tắt
       }
     }
-    if(strcmp((const char*)&topic,USER_INTERRACT_MODE_TOPIC) == 0) //check topic mode
-    {
-      if(strcmp((const char*)&payload,"manual") == 0) 
-      {
-        manual_mode = true;
-        auto_mode = false;
-      } else if (strcmp((const char*)&payload,"auto") == 0)
-      {
-        //do nothing
-        auto_mode = true;
-        manual_mode = false;
-      }
-    }
+    
   }
 
 }
@@ -227,17 +234,15 @@ void setup() {
 
 void send_data() {
   client.publish(MQTT_TOPIC,String(ReadHumidity(pin_hm)).c_str(),true); 
-  client.publish(MQTT_DHT_TOPIC_H,String(analogRead(DHTPIN)).c_str(),true); 
-  client.publish(MQTT_DHT_TOPIC_T,String(analogRead(DHTPIN)).c_str(),true); 
+  //client.publish(MQTT_DHT_TOPIC_H,String(analogRead(DHTPIN)).c_str(),true); 
+  //client.publish(MQTT_DHT_TOPIC_T,String(analogRead(DHTPIN)).c_str(),true); 
   //delay(1000*10);
-  delay(1000);
+  delay(500);
 }
 
 
 void loop() {
   UpdateTimeRTC();
-
-  CheckOnActive();
   delay(200);
   client.loop();
   if (!client.connected()) {
