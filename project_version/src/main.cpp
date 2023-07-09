@@ -9,15 +9,15 @@
 //#include <DHT.h>
 //#include <DHT_U.h>
 
-//#define DHTPIN 5 //pin đọc dữ liệu cảm biến nhiệt độ, độ ẩm
+//#define DHTPIN GPIO_NUM_5 //pin đọc dữ liệu cảm biến nhiệt độ, độ ẩm
 //#define DHTTYPE  DHT11
 #define pin_hm GPIO_NUM_34  // pin doc du lieu tu cam bien do am 
 #define pin_valve GPIO_NUM_2 // pin kich van tuoi
 //#define pin_button GPIO_NUM_17 // pin chuyen che do (Manual/Auto)
-#define MQTT_SERVER "broker1011.cloud.shiftr.io"
+#define MQTT_SERVER "neonlightning355.cloud.shiftr.io"
 #define MQTT_PORT 1883
-#define MQTT_USER "broker1011"
-#define MQTT_PASSWORD "JPq0XvVj0dhW078L"
+#define MQTT_USER "neonlightning355"
+#define MQTT_PASSWORD "UAx5eAK2z7qw6B4z"
 #define MQTT_TOPIC "sensor/soil_mst"
 //#define MQTT_DHT_TOPIC_H "sensor/humidity"
 //#define MQTT_DHT_TOPIC_T "sensor/temperature"
@@ -139,6 +139,8 @@ void connect_to_broker(){
     clientID += String(random(0xffff), HEX);
     if (client.connect(clientID.c_str(), MQTT_USER, MQTT_PASSWORD)) {
       Serial.println("Đã kết nối");
+      //mặc định khi node esp32 mất kết nối khởi động sẽ tự vô trạng thái auto
+      client.publish("mode","1",false);
       client.subscribe(MQTT_TOPIC); 
       //client.subscribe(MQTT_DHT_TOPIC_H); 
       //client.subscribe(MQTT_DHT_TOPIC_T); 
@@ -177,8 +179,8 @@ void callback(char* topic, byte *payload, unsigned int length) {
     { 
       manual_mode = true;
       auto_mode = false;
-      digitalWrite(pin_valve,LOW);
-      on_off = 0;
+      //digitalWrite(pin_valve,LOW);
+      //on_off = 0;
       //ready = 1;
     } else if ((char)payload[0]=='1')
     {
@@ -197,6 +199,9 @@ void callback(char* topic, byte *payload, unsigned int length) {
   if(auto_mode && !manual_mode)
   { 
     CheckOnActive();
+    char temp_c[100];
+    sprintf(temp_c, "%d",on_off);
+    client.publish("valve_state",temp_c,false); 
   } else if(manual_mode && !auto_mode)
   { 
     //nếu topic nhận được chuyển chế độ thì chỉnh lại biến
@@ -209,11 +214,10 @@ void callback(char* topic, byte *payload, unsigned int length) {
       } else if((char)payload[0]=='3') //tắt van tưới
       { 
         digitalWrite(pin_valve,LOW); //tắt van
+        on_off = 0;
       }
-    }
-    
+    }   
   }
-
 }
 
 void setup() {
