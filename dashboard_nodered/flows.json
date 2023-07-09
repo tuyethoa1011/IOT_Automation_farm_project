@@ -1,0 +1,923 @@
+[
+    {
+        "id": "0bbf369bdd742751",
+        "type": "mqtt in",
+        "z": "d5057ccf62f493ec",
+        "name": "temperature",
+        "topic": "IOT",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "881ba1922aef3c64",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1510,
+        "y": 640,
+        "wires": [
+            [
+                "eb170fe71c9dfad6"
+            ]
+        ]
+    },
+    {
+        "id": "4dcf633503a24f8c",
+        "type": "mqtt in",
+        "z": "d5057ccf62f493ec",
+        "name": "humidity",
+        "topic": "IOT",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "881ba1922aef3c64",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1500,
+        "y": 540,
+        "wires": [
+            [
+                "7ac5c3bac09f2a1a"
+            ]
+        ]
+    },
+    {
+        "id": "eb170fe71c9dfad6",
+        "type": "firebase modify",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Temperature",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1930,
+        "y": 660,
+        "wires": [
+            [
+                "24cc204342ae2f8a"
+            ]
+        ]
+    },
+    {
+        "id": "7ac5c3bac09f2a1a",
+        "type": "firebase modify",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Humidity",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1920,
+        "y": 560,
+        "wires": [
+            [
+                "85858922d5db9f62"
+            ]
+        ]
+    },
+    {
+        "id": "81aa8e25193c6830",
+        "type": "firebase modify",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Soil Moisture",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1930,
+        "y": 480,
+        "wires": [
+            [
+                "fa2a804c4c1f18d9"
+            ]
+        ]
+    },
+    {
+        "id": "85858922d5db9f62",
+        "type": "ui_chart",
+        "z": "d5057ccf62f493ec",
+        "name": "humid chart",
+        "group": "412fa16c47f5d725",
+        "order": 6,
+        "width": 22,
+        "height": 5,
+        "label": "Độ ẩm (%)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "20",
+        "ymax": "95",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 2330,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "24cc204342ae2f8a",
+        "type": "ui_chart",
+        "z": "d5057ccf62f493ec",
+        "name": "temp chart",
+        "group": "412fa16c47f5d725",
+        "order": 7,
+        "width": 22,
+        "height": 5,
+        "label": "Nhiệt độ (C)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "50",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 2330,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fa2a804c4c1f18d9",
+        "type": "ui_chart",
+        "z": "d5057ccf62f493ec",
+        "name": "soil gauge",
+        "group": "412fa16c47f5d725",
+        "order": 5,
+        "width": 22,
+        "height": 5,
+        "label": "Độ ẩm đất (pH)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 2330,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "370f9790f24e244c",
+        "type": "ui_switch",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "label": "Tưới nước",
+        "tooltip": "",
+        "group": "e78c50da641f73fb",
+        "order": 1,
+        "width": 7,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "2",
+        "onvalueType": "num",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "3",
+        "offvalueType": "num",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 3090,
+        "y": 940,
+        "wires": [
+            [
+                "7aaac1f067d1eefc",
+                "cfd393e422d815b8"
+            ]
+        ]
+    },
+    {
+        "id": "284f6e6e1de0112d",
+        "type": "moment",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "topic": "",
+        "input": "",
+        "inputType": "date",
+        "inTz": "Asia/Bangkok",
+        "adjAmount": "0",
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "HH:mm:ss",
+        "locale": "en-US",
+        "output": "",
+        "outputType": "msg",
+        "outTz": "Asia/Bangkok",
+        "x": 1840,
+        "y": 1520,
+        "wires": [
+            [
+                "c5359f52f660310e"
+            ]
+        ]
+    },
+    {
+        "id": "96242f5a9cfbe157",
+        "type": "moment",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "topic": "",
+        "input": "",
+        "inputType": "date",
+        "inTz": "Asia/Bangkok",
+        "adjAmount": "0",
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "DD/MM/YYYY",
+        "locale": "en-US",
+        "output": "",
+        "outputType": "msg",
+        "outTz": "Asia/Bangkok",
+        "x": 1840,
+        "y": 1440,
+        "wires": [
+            [
+                "8ae2ac679cb53633"
+            ]
+        ]
+    },
+    {
+        "id": "8ae2ac679cb53633",
+        "type": "ui_text",
+        "z": "d5057ccf62f493ec",
+        "group": "412fa16c47f5d725",
+        "order": 1,
+        "width": 7,
+        "height": 1,
+        "name": "",
+        "label": "Ngày",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2050,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "c5359f52f660310e",
+        "type": "ui_text",
+        "z": "d5057ccf62f493ec",
+        "group": "412fa16c47f5d725",
+        "order": 3,
+        "width": 7,
+        "height": 1,
+        "name": "",
+        "label": "Giờ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2050,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "c9f526d7a023023b",
+        "type": "inject",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1610,
+        "y": 1480,
+        "wires": [
+            [
+                "96242f5a9cfbe157",
+                "284f6e6e1de0112d"
+            ]
+        ]
+    },
+    {
+        "id": "dda8db2df627c52b",
+        "type": "ui_text",
+        "z": "d5057ccf62f493ec",
+        "group": "01860874c157e23b",
+        "order": 2,
+        "width": 7,
+        "height": 2,
+        "name": "",
+        "label": "Mode: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1750,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "7aaac1f067d1eefc",
+        "type": "ui_text",
+        "z": "d5057ccf62f493ec",
+        "group": "e78c50da641f73fb",
+        "order": 2,
+        "width": 7,
+        "height": 1,
+        "name": "",
+        "label": "Watering State",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 3320,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "1ceb041706349eda",
+        "type": "change",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"group\":{\"show\":[\"Plant_Dashboard_Tuoinuoc\"]}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2460,
+        "y": 980,
+        "wires": [
+            [
+                "92cafdaeb1371d98"
+            ]
+        ]
+    },
+    {
+        "id": "1d16c9bc3d6c94dd",
+        "type": "switch",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1730,
+        "y": 920,
+        "wires": [
+            [
+                "0cd9960d01783540"
+            ],
+            [
+                "dacac14e835139b6"
+            ]
+        ]
+    },
+    {
+        "id": "dacac14e835139b6",
+        "type": "change",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"group\":{\"hide\":[\"Plant_Dashboard_Tuoinuoc\"]}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1940,
+        "y": 1000,
+        "wires": [
+            [
+                "92cafdaeb1371d98"
+            ]
+        ]
+    },
+    {
+        "id": "92cafdaeb1371d98",
+        "type": "ui_ui_control",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "events": "all",
+        "x": 2360,
+        "y": 1140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cfd393e422d815b8",
+        "type": "mqtt out",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "topic": "water_manual",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "881ba1922aef3c64",
+        "x": 3320,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "58d513ce8c5477cd",
+        "type": "mqtt out",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "topic": "mode",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "881ba1922aef3c64",
+        "x": 1730,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "5befee4a63ddd49f",
+        "type": "ui_toast",
+        "z": "d5057ccf62f493ec",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "Continue",
+        "cancel": "Cancel",
+        "raw": true,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 2730,
+        "y": 820,
+        "wires": [
+            [
+                "9590e12680ad0f06"
+            ]
+        ]
+    },
+    {
+        "id": "37b04f87e7ccd90f",
+        "type": "template",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<b>Lưu ý:</b> Độ ẩm đất hiện tại đang khá cao<br>\nBạn vẫn muốn tiếp tục tưới cây chứ? <br>",
+        "output": "str",
+        "x": 2460,
+        "y": 820,
+        "wires": [
+            [
+                "5befee4a63ddd49f"
+            ]
+        ]
+    },
+    {
+        "id": "9590e12680ad0f06",
+        "type": "switch",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Continue",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Cancel",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2930,
+        "y": 820,
+        "wires": [
+            [
+                "1ceb041706349eda"
+            ],
+            [
+                "06a3b7bf711d6d7e"
+            ]
+        ]
+    },
+    {
+        "id": "4ac843fe5b3c2f60",
+        "type": "ui_dropdown",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "01860874c157e23b",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "Manual",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Auto",
+                "value": 1,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 1560,
+        "y": 1020,
+        "wires": [
+            [
+                "58d513ce8c5477cd",
+                "dda8db2df627c52b",
+                "1d16c9bc3d6c94dd"
+            ]
+        ]
+    },
+    {
+        "id": "06a3b7bf711d6d7e",
+        "type": "function",
+        "z": "d5057ccf62f493ec",
+        "name": "reset_option",
+        "func": "if(msg.payload == 'Cancel')\n{\n    msg.payload = '1';\n} else {\n    msg.payload = '0';\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2190,
+        "y": 920,
+        "wires": [
+            [
+                "4ac843fe5b3c2f60"
+            ]
+        ]
+    },
+    {
+        "id": "1dc591ea97e55839",
+        "type": "mqtt in",
+        "z": "d5057ccf62f493ec",
+        "name": "soil_moist",
+        "topic": "sensor/soil_mst",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "881ba1922aef3c64",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1500,
+        "y": 440,
+        "wires": [
+            [
+                "81aa8e25193c6830",
+                "58e34f8da3ff60b3"
+            ]
+        ]
+    },
+    {
+        "id": "0cd9960d01783540",
+        "type": "function",
+        "z": "d5057ccf62f493ec",
+        "name": "kt_dk_mode",
+        "func": "if(msg.payload== '0')\n{\n    msg.payload = flow.get(\"soil_val\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1930,
+        "y": 780,
+        "wires": [
+            [
+                "176e0760caeb433d",
+                "83cd828ed7647bd8"
+            ]
+        ]
+    },
+    {
+        "id": "3993707725697f08",
+        "type": "switch",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "no",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "yes",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2290,
+        "y": 820,
+        "wires": [
+            [
+                "37b04f87e7ccd90f"
+            ],
+            [
+                "1ceb041706349eda"
+            ]
+        ]
+    },
+    {
+        "id": "176e0760caeb433d",
+        "type": "debug",
+        "z": "d5057ccf62f493ec",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2040,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "58e34f8da3ff60b3",
+        "type": "change",
+        "z": "d5057ccf62f493ec",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "soil_val",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1720,
+        "y": 380,
+        "wires": [
+            [
+                "9cd8d9b93a473b4b"
+            ]
+        ]
+    },
+    {
+        "id": "83cd828ed7647bd8",
+        "type": "function",
+        "z": "d5057ccf62f493ec",
+        "name": "kt_dk_doamdat",
+        "func": "if(msg.payload < '75')\n{\n    msg.payload = 'yes';\n} else if (msg.payload >= '75')\n{\n    msg.payload = 'no';\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2120,
+        "y": 820,
+        "wires": [
+            [
+                "3993707725697f08",
+                "024c3ed6174a7f41"
+            ]
+        ]
+    },
+    {
+        "id": "024c3ed6174a7f41",
+        "type": "debug",
+        "z": "d5057ccf62f493ec",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2220,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "9cd8d9b93a473b4b",
+        "type": "debug",
+        "z": "d5057ccf62f493ec",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1920,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "881ba1922aef3c64",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "broker1011.cloud.shiftr.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "412fa16c47f5d725",
+        "type": "ui_group",
+        "name": "Date&Time",
+        "tab": "a13412eb103bfd99",
+        "order": 1,
+        "disp": false,
+        "width": 22,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e78c50da641f73fb",
+        "type": "ui_group",
+        "name": "Tuoinuoc",
+        "tab": "a13412eb103bfd99",
+        "order": 2,
+        "disp": true,
+        "width": 7,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "01860874c157e23b",
+        "type": "ui_group",
+        "name": "Control",
+        "tab": "a13412eb103bfd99",
+        "order": 3,
+        "disp": true,
+        "width": 7,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a13412eb103bfd99",
+        "type": "ui_tab",
+        "name": "Plant_Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
